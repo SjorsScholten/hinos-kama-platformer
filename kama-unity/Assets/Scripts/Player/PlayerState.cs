@@ -40,6 +40,25 @@ public abstract class GroundedPlayerState : PlayerState {
     }
 }
 
+public abstract class AfloatPlayerState : PlayerState {
+
+    public AfloatPlayerState(PlayerController source, string name, PlayerStateFactory factory) : base(source, name, factory) {
+
+    }
+
+    public override void Enter() {
+        
+    }
+
+    public override void Exit() {
+        
+    }
+
+    public override void Update() {
+        
+    }
+}
+
 public class IdlePlayerState : GroundedPlayerState {
 
     public IdlePlayerState(PlayerController source, PlayerStateFactory factory) : base(source, "Idle", factory) {

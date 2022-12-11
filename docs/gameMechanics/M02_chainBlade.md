@@ -1,8 +1,9 @@
-# Chain Blade Mechanics
+# Grapple Mechanics
 
-- The player can cast the blade, casting the blade throws the blade into the targeting direction
-- The player can pull himself towards the anchor point
-- The player can pull the object towards himself
+When the player holds down the cast-key, he will throw a hand towards a targeting direction.
+
+When the hand is thrown, it will move towards the throwing direction until:
+- 
 
 ## Casting the blade
 
@@ -26,4 +27,9 @@ If an anchor point is breakable and the player pulls the blade the anchor point 
 
 ## Lunging
 
-When the blade is anchored, and the player releases the cast key, he can pull himself towards the anchor point.
+When the blade is anchored, and the player releases the cast key, he can pull himself towards the anchor point. The player will move towards the anchor point in a straight line until it reaches the point.
+
+- The player can throw the blade into a direction
+- The blade will fly towards a direction until:
+    - The blade hits a collider
+    - The blade exceeds the range towards the player

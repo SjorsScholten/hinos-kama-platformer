@@ -6,6 +6,18 @@ public class PlayerController : MonoBehaviour, IStateMachine<PlayerController> {
     [SerializeField] private float sprintSpeed = 5f;
     [SerializeField] private float jumpHeight = 2f;
 
+    [Header("Grapple Settings")]
+    [SerializeField] private float grappleRange;
+    [SerializeField] private float grappleSpeed;
+    [SerializeField] private Transform grappleDirectionClue;
+    private Vector2 grappleDirection;
+    private Vector2 grappleOrigin;
+    private Camera mainCamera;
+
+    [SerializeField] private GrappleTarget grappleTarget;
+
+    private new Collider2D collider;
+
     #region Input
     private float moveInputAxis;
     private bool jumpInput;
@@ -44,10 +56,14 @@ public class PlayerController : MonoBehaviour, IStateMachine<PlayerController> {
     #endregion
 
     private SpriteRenderer spriteRenderer;
+
     private void Awake() {
         body = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        collider = GetComponent<Collider2D>();
+
+        mainCamera = Camera.main;
 
         isGroundedAnimHash = Animator.StringToHash("isGrounded");
         isMovingAnimHash = Animator.StringToHash("walking");
@@ -65,36 +81,30 @@ public class PlayerController : MonoBehaviour, IStateMachine<PlayerController> {
         if(moveInputAxis != 0) 
             spriteRenderer.flipX = moveInputAxis < 0;
 
+        var worldMousePos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        var origin = collider.bounds.center;
+        grappleDirection = worldMousePos - origin;
+        grappleOrigin = origin;
+        if (Input.GetKeyDown(KeyCode.Z)) {
+            grappleTarget.Throw(origin, grappleDirection.normalized);
+        }
+
         currentState.Update();
     }
 
     private void FixedUpdate() {
-        stepsSinceLastGrounded += 1;
+        Debug.DrawRay(grappleOrigin, grappleDirection, Color.red, Time.fixedDeltaTime);
+        UpdatePhysicsState();
 
-        if(OnGround) {
-            stepsSinceLastGrounded = 0;
-            if (groundContactCount > 1)
-                contactNormal.Normalize();
-        }
-        else {
-            contactNormal = Vector2.up;
-        }
-
-        velocity = body.velocity;
         velocity.x = hMove;
 
         if(jumpInput) {
-            if (OnGround) {
-                jumpInput = false;
-                velocity.y += Mathf.Sqrt(-2f * Physics2D.gravity.y * jumpHeight);
-            }
+            ProcessJump();
         }
 
         body.velocity = velocity;
 
-        // Clear state
-        groundContactCount = 0;
-        contactNormal = Vector2.zero;
+        ClearPhysicsState();
     }
 
     private void OnCollisionStay2D(Collision2D collision) {
@@ -108,9 +118,14 @@ public class PlayerController : MonoBehaviour, IStateMachine<PlayerController> {
     }
 
     private void OnGUI() {
-        GUILayout.BeginArea(new Rect(10, 10, 300, 100));
+        GUILayout.BeginArea(new Rect(10, 10, 300, 100), "Player");
         GUILayout.Label($"State: {currentState.name}");
         GUILayout.Label($"FloorNormal({groundContactCount}): {contactNormal}");
+        GUILayout.EndArea();
+
+        GUILayout.BeginArea(new Rect(Screen.width - 310, 10, 300, 100), "Grapple");
+        GUILayout.Space(5);
+        GUILayout.Label($"Direction: {grappleDirection}");
         GUILayout.EndArea();
     }
 
@@ -125,8 +140,35 @@ public class PlayerController : MonoBehaviour, IStateMachine<PlayerController> {
         jumpInput |= Input.GetButtonDown("Jump");
     }
 
-    private void ProcessMovement() {
+    private void UpdatePhysicsState() {
+        stepsSinceLastGrounded += 1;
 
+        if (OnGround) {
+            stepsSinceLastGrounded = 0;
+            if (groundContactCount > 1)
+                contactNormal.Normalize();
+        }
+        else {
+            contactNormal = Vector2.up;
+        }
+
+        velocity = body.velocity;
+    }
+
+    private void ClearPhysicsState() {
+        groundContactCount = 0;
+        contactNormal = Vector2.zero;
+    }
+
+    private void ProcessMovement() {
+        
+    }
+
+    private void ProcessJump() {
+        if (OnGround) {
+            jumpInput = false;
+            velocity.y += Mathf.Sqrt(-2f * Physics2D.gravity.y * jumpHeight);
+        }
     }
 
     public void AnimatorSetGrounded(bool value) {
