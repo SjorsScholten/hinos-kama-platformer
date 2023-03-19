@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class PlayerState : State<PlayerController> {
     protected PlayerStateFactory factory;
+
     public PlayerState(PlayerController source, string name, PlayerStateFactory factory) : base(source, name) {
         this.factory = factory;
     }
@@ -12,6 +13,7 @@ public abstract class PlayerState : State<PlayerController> {
 public class PlayerStateFactory {
     private readonly IdlePlayerState idlePlayerState;
     private readonly MovingPlayerState movingPlayerState;
+
     public PlayerStateFactory(PlayerController source) {
         idlePlayerState = new IdlePlayerState(source, this);
         movingPlayerState = new MovingPlayerState(source, this);
@@ -31,13 +33,9 @@ public abstract class GroundedPlayerState : PlayerState {
         //source.AnimatorSetGrounded(true);
     }
 
-    public override void Exit() {
-        
-    }
+    public override void Exit() {}
 
-    public override void Update() {
-        
-    }
+    public override void Update() {}
 }
 
 public abstract class AfloatPlayerState : PlayerState {
@@ -46,17 +44,11 @@ public abstract class AfloatPlayerState : PlayerState {
 
     }
 
-    public override void Enter() {
-        
-    }
+    public override void Enter() {}
 
-    public override void Exit() {
-        
-    }
+    public override void Exit() {}
 
-    public override void Update() {
-        
-    }
+    public override void Update() {}
 }
 
 public class IdlePlayerState : GroundedPlayerState {
@@ -87,14 +79,13 @@ public class MovingPlayerState : GroundedPlayerState {
 
     public override void Enter() {
         base.Enter();
-
         source.AnimatorSetMoving(true);
     }
 
     public override void Update() {
         base.Update();
 
-        source.MoveTowards(source.MoveInputAxis, source.WalkSpeed);
+        //source.MoveTowards(source.MoveInputAxis, source.WalkSpeed);
 
         if(source.MoveInputAxis == 0) {
             SwitchState(factory.GetIdleState());

@@ -14,6 +14,12 @@ The player can move using the movement stick.
 - Moving the stick fully to the side, will cause the character to run towards that direction.
 - Flicking the movement stick to the side will cause the character to sprint towards that direction.
 
+## Jumping
+
+We want the player to jump a specified height in a specified duration.
+
+- 
+
 ## Crouching
 
 /* Crouching does not yet have a usefulness in the design
